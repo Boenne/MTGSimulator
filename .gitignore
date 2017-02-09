@@ -1,5 +1,7 @@
-﻿bin/
+﻿[Bb]in
+[Dd]ebug*/
 obj/
 lib/
 packages/
 /src/MTGSimulator/appsettings.json
+/src/.vs
