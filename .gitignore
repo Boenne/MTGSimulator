@@ -1,0 +1,5 @@
+﻿bin/
+obj/
+lib/
+packages/
+/src/MTGSimulator/appsettings.json
