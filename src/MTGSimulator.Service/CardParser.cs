@@ -7,7 +7,13 @@ using Newtonsoft.Json;
 
 namespace MTGSimulator.Service
 {
-    public class CardParser
+    public interface ICardParser
+    {
+        Task<Dictionary<string, Set>> GetSets();
+        Task<Set> GetSet(string setCode);
+    }
+
+    public class CardParser : ICardParser
     {
         public Task<Dictionary<string, Set>> GetSets()
         {

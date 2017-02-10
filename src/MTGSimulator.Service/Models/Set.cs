@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace MTGSimulator.Service.Models
@@ -24,6 +25,6 @@ namespace MTGSimulator.Service.Models
         public string Block { get; set; }
 
         [JsonProperty("cards")]
-        public Card[] Cards { get; set; }
+        public List<Card> Cards { get; set; }
     }
 }

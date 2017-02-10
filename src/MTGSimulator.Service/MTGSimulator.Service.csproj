@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CardParser.cs" />
+    <Compile Include="BoosterCreator.cs" />
+    <Compile Include="Models\Booster.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Set.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
