@@ -13,7 +13,7 @@ namespace MTGSimulator.Service.Tests
 
             var set = await cardParser.GetSet("LEA");
 
-            set.Cards.Length.ShouldBe(295);
+            set.Cards.Count.ShouldBe(295);
         }
 
         [Fact]
