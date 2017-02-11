@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Moq;
 using MTGSimulator.Data.Extensions;
 using MTGSimulator.Data.Models;
 using MTGSimulator.Data.Repositories;
@@ -11,13 +13,14 @@ namespace MTGSimulator.Data.Tests.Repositories
     {
         public DraftSessionRepositoryTests()
         {
-            draftSessionRepository = new DraftSessionRepository();
+            var logger = new Mock<ILogger>();
+            draftSessionRepository = new DraftSessionRepository(logger.Object);
         }
 
         private readonly DraftSessionRepository draftSessionRepository;
 
         [Fact]
-        public async void AllMethodsWork()
+        public async Task AllMethodsWork()
         {
             var id = Guid.NewGuid().ToString().GenerateHash();
             var session = new DraftSession {DraftId = id, HasStarted = true};

@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using MTGSimulator.Data.Contexts;
 using MTGSimulator.Data.Models;
+using Newtonsoft.Json;
 
 namespace MTGSimulator.Data.Repositories
 {
@@ -15,44 +18,81 @@ namespace MTGSimulator.Data.Repositories
 
     public class DraftSessionRepository : IDraftSessionRepository
     {
+        private readonly ILogger logger;
+
+        public DraftSessionRepository(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         public async Task Save(DraftSession draftSession)
         {
-            using (var draftSessionContext = new DraftSessionContext())
+            try
             {
-                draftSessionContext.DraftSessions.Add(draftSession);
-                await draftSessionContext.SaveChangesAsync();
+                using (var databaseContext = new DatabaseContext())
+                {
+                    databaseContext.DraftSessions.Add(draftSession);
+                    await databaseContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(Save)} failed for session '{JsonConvert.SerializeObject(draftSession)}'", e);
             }
         }
 
         public async Task Update(DraftSession draftSession)
         {
-            using (var draftSessionContext = new DraftSessionContext())
+            try
             {
-                var draftSessionToUpdate =
-                    draftSessionContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftSession.DraftId);
-                if (draftSessionToUpdate == null) return;
-                draftSessionToUpdate.HasStarted = draftSession.HasStarted;
-                await draftSessionContext.SaveChangesAsync();
+                using (var databaseContext = new DatabaseContext())
+                {
+                    var draftSessionToUpdate =
+                        databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftSession.DraftId);
+                    if (draftSessionToUpdate == null) return;
+                    draftSessionToUpdate.HasStarted = draftSession.HasStarted;
+                    await databaseContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(Update)} failed for session '{JsonConvert.SerializeObject(draftSession)}'", e);
             }
         }
 
         public async Task<DraftSession> Get(string draftId)
         {
-            using (var draftSessionContext = new DraftSessionContext())
+            try
             {
-                var draftSession = draftSessionContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftId);
-                return draftSession;
+                using (var databaseContext = new DatabaseContext())
+                {
+                    var draftSession =
+                        await databaseContext.DraftSessions.FirstOrDefaultAsync(x => x.DraftId == draftId);
+                    return draftSession;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(Update)} failed for draftId '{draftId}'", e);
+                return null;
             }
         }
 
         public async Task Delete(string draftId)
         {
-            using (var draftSessionContext = new DraftSessionContext())
+            try
             {
-                var draftSession = draftSessionContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftId);
-                if (draftSession == null) return;
-                draftSessionContext.DraftSessions.Remove(draftSession);
-                await draftSessionContext.SaveChangesAsync();
+                using (var databaseContext = new DatabaseContext())
+                {
+                    var draftSession = databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftId);
+                    if (draftSession == null) return;
+                    databaseContext.DraftSessions.Remove(draftSession);
+                    await databaseContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(Delete)} failed for draftId '{draftId}'", e);
             }
         }
     }
