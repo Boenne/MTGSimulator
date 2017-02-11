@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Contexts;
 using MTGSimulator.Data.Models;
 using Newtonsoft.Json;
@@ -16,10 +17,12 @@ namespace MTGSimulator.Data.Repositories
 
     public class DraftPlayerRepository : IDraftPlayerRepository
     {
+        private readonly IDatabaseContextFactory databaseContextFactory;
         private readonly ILogger logger;
 
-        public DraftPlayerRepository(ILogger logger)
+        public DraftPlayerRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger)
         {
+            this.databaseContextFactory = databaseContextFactory;
             this.logger = logger;
         }
 
@@ -27,7 +30,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     var playerExists =
                         await databaseContext.DraftPlayers.AnyAsync(x => x.PlayerId == playerId && x.Id == id);
@@ -45,7 +48,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     databaseContext.DraftPlayers.Add(draftPlayer);
                     await databaseContext.SaveChangesAsync();
@@ -61,7 +64,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftPlayer =
                         await databaseContext.DraftPlayers.FirstOrDefaultAsync(x => x.PlayerId == playerId);

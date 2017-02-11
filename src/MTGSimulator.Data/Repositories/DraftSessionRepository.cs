@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using MTGSimulator.Data.Contexts;
+using Microsoft.EntityFrameworkCore;
+using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Models;
 using Newtonsoft.Json;
 
@@ -18,10 +18,12 @@ namespace MTGSimulator.Data.Repositories
 
     public class DraftSessionRepository : IDraftSessionRepository
     {
+        private readonly IDatabaseContextFactory databaseContextFactory;
         private readonly ILogger logger;
 
-        public DraftSessionRepository(ILogger logger)
+        public DraftSessionRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger)
         {
+            this.databaseContextFactory = databaseContextFactory;
             this.logger = logger;
         }
 
@@ -29,7 +31,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     databaseContext.DraftSessions.Add(draftSession);
                     await databaseContext.SaveChangesAsync();
@@ -45,7 +47,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftSessionToUpdate =
                         databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftSession.DraftId);
@@ -64,7 +66,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftSession =
                         await databaseContext.DraftSessions.FirstOrDefaultAsync(x => x.DraftId == draftId);
@@ -82,7 +84,7 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
-                using (var databaseContext = new DatabaseContext())
+                using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftSession = databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftId);
                     if (draftSession == null) return;
