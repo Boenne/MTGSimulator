@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
+using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Extensions;
 using MTGSimulator.Data.Models;
 using MTGSimulator.Data.Repositories;
@@ -14,7 +15,8 @@ namespace MTGSimulator.Data.Tests.Repositories
         public DraftSessionRepositoryTests()
         {
             var logger = new Mock<ILogger>();
-            draftSessionRepository = new DraftSessionRepository(logger.Object);
+            var databaseContextFactory = new DatabaseContextFactory();
+            draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object);
         }
 
         private readonly DraftSessionRepository draftSessionRepository;
@@ -23,19 +25,23 @@ namespace MTGSimulator.Data.Tests.Repositories
         public async Task AllMethodsWork()
         {
             var id = Guid.NewGuid().ToString().GenerateHash();
-            var session = new DraftSession {DraftId = id, HasStarted = true};
+            var session = new DraftSession {Id = id, HasStarted = false};
 
             await draftSessionRepository.Save(session);
             var draftSession = await draftSessionRepository.Get(id);
 
-            draftSession.DraftId.ShouldBe(id);
-            draftSession.HasStarted.ShouldBe(true);
+            draftSession.Id.ShouldBe(id);
 
-            draftSession.HasStarted = false;
-            await draftSessionRepository.Update(draftSession);
+            var hasStarted = await draftSessionRepository.HasStarted(draftSession.Id);
+            hasStarted.ShouldBe(false);
+
+            await draftSessionRepository.Start(draftSession.Id);
+
+            hasStarted = await draftSessionRepository.HasStarted(draftSession.Id);
+            hasStarted.ShouldBe(true);
 
             draftSession = await draftSessionRepository.Get(id);
-            draftSession.HasStarted.ShouldBe(false);
+            draftSession.ShouldNotBeNull();
 
             await draftSessionRepository.Delete(id);
             draftSession = await draftSessionRepository.Get(id);

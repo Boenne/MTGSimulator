@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
+using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Extensions;
 using MTGSimulator.Data.Models;
 using MTGSimulator.Data.Repositories;
@@ -14,8 +15,9 @@ namespace MTGSimulator.Data.Tests.Repositories
         public DraftPlayerRepositoryTests()
         {
             var logger = new Mock<ILogger>();
-            draftPlayerRepository = new DraftPlayerRepository(logger.Object);
-            draftSessionRepository = new DraftSessionRepository(logger.Object);
+            var databaseContextFactory = new DatabaseContextFactory();
+            draftPlayerRepository = new DraftPlayerRepository(databaseContextFactory, logger.Object);
+            draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object);
         }
 
         private readonly DraftPlayerRepository draftPlayerRepository;
@@ -26,8 +28,8 @@ namespace MTGSimulator.Data.Tests.Repositories
         {
             var sessionId = Guid.NewGuid().ToString().GenerateHash();
             var playerId = Guid.NewGuid().ToString().GenerateHash();
-            var session = new DraftSession {DraftId = sessionId, HasStarted = true};
-            var draftPlayer = new DraftPlayer {DraftSessionId = session.Id, PlayerId = playerId};
+            var session = new DraftSession {Id = sessionId, HasStarted = true};
+            var draftPlayer = new DraftPlayer {DraftSessionId = session.Id, Id = playerId};
 
             await draftSessionRepository.Save(session);
             await draftPlayerRepository.Save(draftPlayer);
@@ -35,7 +37,7 @@ namespace MTGSimulator.Data.Tests.Repositories
             var playerExists = await draftPlayerRepository.PlayerExists(playerId, draftPlayer.Id);
             playerExists.ShouldBe(true);
 
-            await draftSessionRepository.Delete(session.DraftId);
+            await draftSessionRepository.Delete(session.Id);
             await draftPlayerRepository.Delete(playerId);
 
             playerExists = await draftPlayerRepository.PlayerExists(playerId, draftPlayer.Id);
