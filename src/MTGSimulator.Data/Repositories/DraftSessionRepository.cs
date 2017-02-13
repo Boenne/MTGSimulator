@@ -11,9 +11,10 @@ namespace MTGSimulator.Data.Repositories
     public interface IDraftSessionRepository
     {
         Task Save(DraftSession draftSession);
-        Task Update(DraftSession draftSession);
+        Task Start(string draftId);
         Task<DraftSession> Get(string draftId);
         Task Delete(string draftId);
+        Task<bool> HasStarted(string draftId);
     }
 
     public class DraftSessionRepository : IDraftSessionRepository
@@ -43,22 +44,22 @@ namespace MTGSimulator.Data.Repositories
             }
         }
 
-        public async Task Update(DraftSession draftSession)
+        public async Task Start(string draftId)
         {
             try
             {
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftSessionToUpdate =
-                        databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftSession.DraftId);
+                        databaseContext.DraftSessions.FirstOrDefault(x => x.Id == draftId);
                     if (draftSessionToUpdate == null) return;
-                    draftSessionToUpdate.HasStarted = draftSession.HasStarted;
+                    draftSessionToUpdate.HasStarted = true;
                     await databaseContext.SaveChangesAsync();
                 }
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(Update)} failed for session '{JsonConvert.SerializeObject(draftSession)}'", e);
+                logger.Error($"{nameof(Start)} failed for draftId '{draftId}'", e);
             }
         }
 
@@ -69,13 +70,13 @@ namespace MTGSimulator.Data.Repositories
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftSession =
-                        await databaseContext.DraftSessions.FirstOrDefaultAsync(x => x.DraftId == draftId);
+                        await databaseContext.DraftSessions.FirstOrDefaultAsync(x => x.Id == draftId);
                     return draftSession;
                 }
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(Update)} failed for draftId '{draftId}'", e);
+                logger.Error($"{nameof(Get)} failed for draftId '{draftId}'", e);
                 return null;
             }
         }
@@ -86,7 +87,7 @@ namespace MTGSimulator.Data.Repositories
             {
                 using (var databaseContext = databaseContextFactory.Create())
                 {
-                    var draftSession = databaseContext.DraftSessions.FirstOrDefault(x => x.DraftId == draftId);
+                    var draftSession = databaseContext.DraftSessions.FirstOrDefault(x => x.Id == draftId);
                     if (draftSession == null) return;
                     databaseContext.DraftSessions.Remove(draftSession);
                     await databaseContext.SaveChangesAsync();
@@ -95,6 +96,23 @@ namespace MTGSimulator.Data.Repositories
             catch (Exception e)
             {
                 logger.Error($"{nameof(Delete)} failed for draftId '{draftId}'", e);
+            }
+        }
+
+        public async Task<bool> HasStarted(string draftId)
+        {
+            try
+            {
+                using (var databaseContext = databaseContextFactory.Create())
+                {
+                    var hasStarted = await databaseContext.DraftSessions.AnyAsync(x => x.Id == draftId && x.HasStarted);
+                    return hasStarted;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(Delete)} failed for draftId '{draftId}'", e);
+                return false;
             }
         }
     }

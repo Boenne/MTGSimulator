@@ -11,6 +11,7 @@ namespace MTGSimulator.Data
     {
         public void Error(string message, Exception e)
         {
+            Console.WriteLine($"{message}. {e.Message}. {e.StackTrace}");
         }
     }
 }

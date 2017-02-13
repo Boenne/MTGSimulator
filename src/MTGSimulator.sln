@@ -1,20 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1C7C82F6-2AC1-4FFC-A593-C7E7B61A9DB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8ABEE6F6-A8F7-4389-908C-4C0E67299990}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MTGSimulator", "MTGSimulator\MTGSimulator.xproj", "{3EAA599B-7DAB-4550-95A6-142E90E331A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGSimulator", "MTGSimulator\MTGSimulator.csproj", "{3EAA599B-7DAB-4550-95A6-142E90E331A5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MTGSimulator.Data", "MTGSimulator.Data\MTGSimulator.Data.xproj", "{D445D8B4-0513-415A-A3ED-742640379ABB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGSimulator.Data", "MTGSimulator.Data\MTGSimulator.Data.csproj", "{D445D8B4-0513-415A-A3ED-742640379ABB}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MTGSimulator.Service", "MTGSimulator.Service\MTGSimulator.Service.xproj", "{0AEB2B03-185C-4EB9-B53C-A5DFCB2B6560}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGSimulator.Service", "MTGSimulator.Service\MTGSimulator.Service.csproj", "{0AEB2B03-185C-4EB9-B53C-A5DFCB2B6560}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

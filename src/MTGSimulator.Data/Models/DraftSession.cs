@@ -7,13 +7,14 @@ namespace MTGSimulator.Data.Models
     {
         public DraftSession()
         {
-            Id = Guid.NewGuid();
+            CreationTime = DateTime.Now;
         }
 
         [Key]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public bool HasStarted { get; set; }
-        public string DraftId { get; set; }
+        public string SetCode { get; set; }
+        public DateTime CreationTime { get; set; }
     }
 }

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MTGSimulator.Data.ContextFactory;
-using MTGSimulator.Data.Contexts;
 using MTGSimulator.Data.Models;
 using Newtonsoft.Json;
 
@@ -10,9 +9,11 @@ namespace MTGSimulator.Data.Repositories
 {
     public interface IDraftPlayerRepository
     {
-        Task<bool> PlayerExists(string playerId, Guid id);
+        Task<bool> PlayerExists(string playerId, string draftId);
         Task Save(DraftPlayer draftPlayer);
         Task Delete(string playerId);
+        Task<int> GetNumberOfPlayers(string draftId);
+        Task<string> GetNextPlayer(string playerId, string draftId);
     }
 
     public class DraftPlayerRepository : IDraftPlayerRepository
@@ -26,20 +27,20 @@ namespace MTGSimulator.Data.Repositories
             this.logger = logger;
         }
 
-        public async Task<bool> PlayerExists(string playerId, Guid id)
+        public async Task<bool> PlayerExists(string playerId, string draftId)
         {
             try
             {
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var playerExists =
-                        await databaseContext.DraftPlayers.AnyAsync(x => x.PlayerId == playerId && x.Id == id);
+                        await databaseContext.DraftPlayers.AnyAsync(x => x.Id == playerId && x.DraftSessionId == draftId);
                     return playerExists;
                 }
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(PlayerExists)} failed for playerId '{playerId}' and id '{id}'", e);
+                logger.Error($"{nameof(PlayerExists)} failed for playerId '{playerId}' and draftId '{draftId}'", e);
                 return false;
             }
         }
@@ -50,6 +51,10 @@ namespace MTGSimulator.Data.Repositories
             {
                 using (var databaseContext = databaseContextFactory.Create())
                 {
+                    var count =
+                        await databaseContext.DraftPlayers.CountAsync(
+                            x => x.DraftSessionId == draftPlayer.DraftSessionId);
+                    draftPlayer.Number = count;
                     databaseContext.DraftPlayers.Add(draftPlayer);
                     await databaseContext.SaveChangesAsync();
                 }
@@ -60,6 +65,23 @@ namespace MTGSimulator.Data.Repositories
             }
         }
 
+        public async Task<int> GetNumberOfPlayers(string draftId)
+        {
+            try
+            {
+                using (var databaseContext = databaseContextFactory.Create())
+                {
+                    var numberOfPlayers = await databaseContext.DraftPlayers.CountAsync(x => x.DraftSessionId == draftId);
+                    return numberOfPlayers;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(GetNumberOfPlayers)} failed for draftId '{draftId}'", e);
+                return 0;
+            }
+        }
+
         public async Task Delete(string playerId)
         {
             try
@@ -67,7 +89,7 @@ namespace MTGSimulator.Data.Repositories
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var draftPlayer =
-                        await databaseContext.DraftPlayers.FirstOrDefaultAsync(x => x.PlayerId == playerId);
+                        await databaseContext.DraftPlayers.FirstOrDefaultAsync(x => x.Id == playerId);
                     if (draftPlayer == null) return;
                     databaseContext.DraftPlayers.Remove(draftPlayer);
                     await databaseContext.SaveChangesAsync();
@@ -76,6 +98,35 @@ namespace MTGSimulator.Data.Repositories
             catch (Exception e)
             {
                 logger.Error($"{nameof(Delete)} failed for playerId '{playerId}'", e);
+            }
+        }
+
+        public async Task<string> GetNextPlayer(string playerId, string draftId)
+        {
+            try
+            {
+                using (var databaseContext = databaseContextFactory.Create())
+                {
+                    var numberOfPlayers = await databaseContext.DraftPlayers.CountAsync(x => x.DraftSessionId == draftId);
+                    var player =
+                        await databaseContext.DraftPlayers.FirstAsync(
+                            x => x.Id == playerId && x.DraftSessionId == draftId);
+                    DraftPlayer draftPlayer;
+                    if (player.Number < numberOfPlayers - 1)
+                        draftPlayer =
+                            await databaseContext.DraftPlayers.FirstAsync(
+                                x => x.Number == player.Number + 1 && x.DraftSessionId == draftId);
+                    else
+                        draftPlayer =
+                            await databaseContext.DraftPlayers.FirstAsync(
+                                x => x.Number == 0 && x.DraftSessionId == draftId);
+                    return draftPlayer.Id;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{nameof(GetNextPlayer)} failed for playerId '{playerId}' and draftId '{draftId}'", e);
+                return null;
             }
         }
     }
