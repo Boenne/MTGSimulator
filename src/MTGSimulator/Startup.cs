@@ -1,8 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MTGSimulator.Data;
+using MTGSimulator.Data.ContextFactory;
+using MTGSimulator.Data.Repositories;
+using MTGSimulator.Service;
+using ILogger = MTGSimulator.Data.ILogger;
 
 namespace MTGSimulator
 {
@@ -26,6 +33,14 @@ namespace MTGSimulator
             // Add framework services.
             services.AddMvc();
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+            var container = new ServiceContainer();
+            services.AddScoped<ILogger, Logger>();
+            services.AddScoped<IDraftPlayerRepository, DraftPlayerRepository>();
+            services.AddScoped<IDraftSessionRepository, DraftSessionRepository>();
+            services.AddSingleton<IDatabaseContextFactory>(new DatabaseContextFactory(Configuration.GetConnectionString("DefaultConnectionString")));
+            services.AddScoped<ICardParser, CardParser>();
+            services.AddScoped<IBoosterCreator, BoosterCreator>();
+            container.CreateServiceProvider(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

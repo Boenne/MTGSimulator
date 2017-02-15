@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using MTGSimulator.Data;
-using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Extensions;
 using MTGSimulator.Data.Models;
 using MTGSimulator.Data.Repositories;
@@ -13,19 +12,19 @@ namespace MTGSimulator.Hubs
 {
     public class DraftHub : Hub
     {
-        private readonly BoosterCreator boosterCreator;
+        private readonly IBoosterCreator boosterCreator;
         private readonly Dictionary<string, string> connections = new Dictionary<string, string>();
-        private readonly DraftPlayerRepository draftPlayerRepository;
-        private readonly DraftSessionRepository draftSessionRepository;
-        private readonly Logger logger;
+        private readonly IDraftPlayerRepository draftPlayerRepository;
+        private readonly IDraftSessionRepository draftSessionRepository;
+        private readonly ILogger logger;
 
-        public DraftHub()
+        public DraftHub(IBoosterCreator boosterCreator, IDraftPlayerRepository draftPlayerRepository,
+            IDraftSessionRepository draftSessionRepository, ILogger logger)
         {
-            var databaseContextFactory = new DatabaseContextFactory();
-            logger = new Logger();
-            draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger);
-            draftPlayerRepository = new DraftPlayerRepository(databaseContextFactory, logger);
-            boosterCreator = new BoosterCreator(new CardParser());
+            this.boosterCreator = boosterCreator;
+            this.draftPlayerRepository = draftPlayerRepository;
+            this.draftSessionRepository = draftSessionRepository;
+            this.logger = logger;
         }
 
         public async Task CreateDraft(string setCode)
@@ -34,8 +33,8 @@ namespace MTGSimulator.Hubs
             {
                 var draftId = Guid.NewGuid().ToString().GenerateHash();
                 var playerId = Guid.NewGuid().ToString().GenerateHash();
-                var draftSession = new DraftSession { Id = draftId, SetCode = setCode };
-                var draftPlayer = new DraftPlayer { DraftSessionId = draftSession.Id, Id = playerId };
+                var draftSession = new DraftSession {Id = draftId, SetCode = setCode};
+                var draftPlayer = new DraftPlayer {DraftSessionId = draftSession.Id, Id = playerId};
                 await draftSessionRepository.Save(draftSession);
                 await draftPlayerRepository.Save(draftPlayer);
                 await JoinGroup(draftId);
@@ -56,7 +55,7 @@ namespace MTGSimulator.Hubs
                 var draftSession = await draftSessionRepository.Get(draftId);
                 if (draftSession == null) return;
                 var playerId = Guid.NewGuid().ToString().GenerateHash();
-                var draftPlayer = new DraftPlayer { DraftSessionId = draftSession.Id, Id = playerId };
+                var draftPlayer = new DraftPlayer {DraftSessionId = draftSession.Id, Id = playerId};
                 await draftPlayerRepository.Save(draftPlayer);
                 var boosters = await boosterCreator.CreateBoosters(draftSession.SetCode, 3);
                 Clients.Caller.InitializeGame(draftId, draftPlayer, boosters);
