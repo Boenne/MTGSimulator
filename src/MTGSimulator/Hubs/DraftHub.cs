@@ -40,11 +40,13 @@ namespace MTGSimulator.Hubs
                 await JoinGroup(draftId);
                 var boosters = await boosterCreator.CreateBoosters(setCode, 3);
                 connections.Add(draftPlayer.Id, Context.ConnectionId);
-                Clients.Caller.InitializeGame(draftId, draftPlayer, boosters);
+                Clients.Caller.InitializeGame(new {draftId, playerId, boosters});
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(CreateDraft)} failed for {nameof(setCode)} '{setCode}'", e);
+                var errorMessage = $"{nameof(CreateDraft)} failed for {nameof(setCode)} '{setCode}'";
+                logger.Error(errorMessage, e);
+                throw new HubException(errorMessage);
             }
         }
 
@@ -58,11 +60,13 @@ namespace MTGSimulator.Hubs
                 var draftPlayer = new DraftPlayer {DraftSessionId = draftSession.Id, Id = playerId};
                 await draftPlayerRepository.Save(draftPlayer);
                 var boosters = await boosterCreator.CreateBoosters(draftSession.SetCode, 3);
-                Clients.Caller.InitializeGame(draftId, draftPlayer, boosters);
+                Clients.Caller.InitializeGame(new { draftId, playerId, boosters });
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(JoinDraft)} failed for {nameof(draftId)} '{draftId}'", e);
+                var errorMessage = $"{nameof(JoinDraft)} failed for {nameof(draftId)} '{draftId}'";
+                logger.Error(errorMessage, e);
+                throw new HubException(errorMessage);
             }
         }
 
@@ -80,9 +84,12 @@ namespace MTGSimulator.Hubs
             }
             catch (Exception e)
             {
+                var errorMessage =
+                    $"{nameof(PassOnBooster)} failed for {nameof(playerId)} '{playerId}' and {nameof(draftId)} '{draftId}'";
                 logger.Error(
-                    $"{nameof(PassOnBooster)} failed for {nameof(playerId)} '{playerId}' and {nameof(draftId)} '{draftId}'",
+                    errorMessage,
                     e);
+                throw new HubException(errorMessage);
             }
         }
 
@@ -96,7 +103,9 @@ namespace MTGSimulator.Hubs
             }
             catch (Exception e)
             {
-                logger.Error($"{nameof(StartDraft)} failed for {nameof(draftId)} '{draftId}'", e);
+                var errorMessage = $"{nameof(StartDraft)} failed for {nameof(draftId)} '{draftId}'";
+                logger.Error(errorMessage, e);
+                throw new HubException(errorMessage);
             }
         }
 
