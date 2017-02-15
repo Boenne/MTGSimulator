@@ -15,7 +15,7 @@ namespace MTGSimulator.Data.Tests.Repositories
         public DraftPlayerRepositoryTests()
         {
             var logger = new Mock<ILogger>();
-            var databaseContextFactory = new DatabaseContextFactory();
+            var databaseContextFactory = new DatabaseContextFactory("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True");
             draftPlayerRepository = new DraftPlayerRepository(databaseContextFactory, logger.Object);
             draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object);
         }
@@ -28,17 +28,17 @@ namespace MTGSimulator.Data.Tests.Repositories
         {
             var sessionId = Guid.NewGuid().ToString().GenerateHash();
             var playerId = Guid.NewGuid().ToString().GenerateHash();
-            var session = new DraftSession {Id = sessionId, HasStarted = true};
+            var session = new DraftSession {Id = sessionId, HasStarted = true, SetCode = "LEA"};
             var draftPlayer = new DraftPlayer {DraftSessionId = session.Id, Id = playerId};
 
             await draftSessionRepository.Save(session);
             await draftPlayerRepository.Save(draftPlayer);
 
-            var playerExists = await draftPlayerRepository.PlayerExists(playerId, draftPlayer.Id);
+            var playerExists = await draftPlayerRepository.PlayerExists(playerId, sessionId);
             playerExists.ShouldBe(true);
 
-            await draftSessionRepository.Delete(session.Id);
             await draftPlayerRepository.Delete(playerId);
+            await draftSessionRepository.Delete(sessionId);
 
             playerExists = await draftPlayerRepository.PlayerExists(playerId, draftPlayer.Id);
             playerExists.ShouldBe(false);

@@ -15,7 +15,7 @@ namespace MTGSimulator.Data.Tests.Repositories
         public DraftSessionRepositoryTests()
         {
             var logger = new Mock<ILogger>();
-            var databaseContextFactory = new DatabaseContextFactory();
+            var databaseContextFactory = new DatabaseContextFactory("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True");
             draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object);
         }
 
@@ -24,27 +24,24 @@ namespace MTGSimulator.Data.Tests.Repositories
         [Fact]
         public async Task AllMethodsWork()
         {
-            var id = Guid.NewGuid().ToString().GenerateHash();
-            var session = new DraftSession {Id = id, HasStarted = false};
+            var sessionId = Guid.NewGuid().ToString().GenerateHash();
+            var session = new DraftSession {Id = sessionId, HasStarted = false, SetCode = "LEA"};
 
             await draftSessionRepository.Save(session);
-            var draftSession = await draftSessionRepository.Get(id);
 
-            draftSession.Id.ShouldBe(id);
-
-            var hasStarted = await draftSessionRepository.HasStarted(draftSession.Id);
+            var hasStarted = await draftSessionRepository.HasStarted(sessionId);
             hasStarted.ShouldBe(false);
 
-            await draftSessionRepository.Start(draftSession.Id);
+            await draftSessionRepository.Start(sessionId);
 
-            hasStarted = await draftSessionRepository.HasStarted(draftSession.Id);
+            hasStarted = await draftSessionRepository.HasStarted(sessionId);
             hasStarted.ShouldBe(true);
 
-            draftSession = await draftSessionRepository.Get(id);
+            var draftSession = await draftSessionRepository.Get(sessionId);
             draftSession.ShouldNotBeNull();
 
-            await draftSessionRepository.Delete(id);
-            draftSession = await draftSessionRepository.Get(id);
+            await draftSessionRepository.Delete(sessionId);
+            draftSession = await draftSessionRepository.Get(sessionId);
 
             draftSession.ShouldBeNull();
         }
