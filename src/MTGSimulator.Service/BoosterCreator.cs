@@ -6,7 +6,12 @@ using MTGSimulator.Service.Models;
 
 namespace MTGSimulator.Service
 {
-    public class BoosterCreator
+    public interface IBoosterCreator
+    {
+        Task<List<Booster>> CreateBoosters(string setCode, int numberOfBoosters);
+    }
+
+    public class BoosterCreator : IBoosterCreator
     {
         private readonly ICardParser cardParser;
 
