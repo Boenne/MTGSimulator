@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace MTGSimulator.Data
 {
@@ -11,7 +12,8 @@ namespace MTGSimulator.Data
     {
         public void Error(string message, Exception e)
         {
-            Console.WriteLine($"{message}. {e.Message}. {e.StackTrace}");
+            if(Debugger.IsAttached)
+                Debug.WriteLine($"{message}. {e.Message}. {e.StackTrace}");
         }
     }
 }
