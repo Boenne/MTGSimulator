@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using MTGSimulator.Service;
 
 namespace MTGSimulator
 {
@@ -13,6 +14,8 @@ namespace MTGSimulator
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
+
+            ExecutingAssembly.SetCurrentAssembly(typeof(Program));
 
             host.Run();
         }
