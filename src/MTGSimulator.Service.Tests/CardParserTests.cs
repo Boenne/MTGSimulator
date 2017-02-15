@@ -6,6 +6,11 @@ namespace MTGSimulator.Service.Tests
 {
     public class CardParserTests
     {
+        public CardParserTests()
+        {
+            ExecutingAssembly.SetCurrentAssembly(GetType());
+        }
+
         [Fact]
         public async Task GetSet_ReturnsCorrectSet()
         {

@@ -7,6 +7,11 @@ namespace MTGSimulator.Service.Tests
 {
     public class BoosterCreatorTests
     {
+        public BoosterCreatorTests()
+        {
+            ExecutingAssembly.SetCurrentAssembly(GetType());
+        }
+
         [Fact]
         public async Task CreateBoosters_CreatesBoostersCorrectly()
         {
