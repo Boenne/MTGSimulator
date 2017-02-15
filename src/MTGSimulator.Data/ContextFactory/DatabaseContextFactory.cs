@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using MTGSimulator.Data.Contexts;
 
 namespace MTGSimulator.Data.ContextFactory
@@ -12,16 +10,18 @@ namespace MTGSimulator.Data.ContextFactory
 
     public class DatabaseContextFactory : IDatabaseContextFactory
     {
+        private readonly string connectionString;
+
+        public DatabaseContextFactory(string connectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
         public DatabaseContext Create()
         {
             var dbContextOptionsBuilder = new DbContextOptionsBuilder();
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            dbContextOptionsBuilder.UseSqlServer(builder.GetConnectionString("DefaultConnectionString"));
+            dbContextOptionsBuilder.UseSqlServer(connectionString);
 
             return new DatabaseContext(dbContextOptionsBuilder.Options);
         }
