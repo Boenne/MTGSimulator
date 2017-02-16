@@ -20,5 +20,33 @@
     },
     // Optinally generate .map file
     "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/draft/controller.min.js",
+    "inputFiles": [
+      "wwwroot/js/draft/controller.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    // Optinally generate .map file
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/basics.min.js",
+    "inputFiles": [
+      "wwwroot/js/app.js",
+      "wwwroot/js/directive.js",
+      "wwwroot/js/signalRService.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    // Optinally generate .map file
+    "sourceMap": false
   }
 ]
