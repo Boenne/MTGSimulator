@@ -12,6 +12,7 @@
         $scope.selectedCardsJson = null;
         $scope.connected = false;
         $scope.draftSessionId = null;
+        $scope.draftSessionIdCandidate = null;
         $scope.selectedSet = null;
         $scope.sets = [];
         $scope.playerId = null;
@@ -60,10 +61,10 @@
             draftHub.invoke("CreateDraft", [$scope.selectedSet], function() {});
         };
         $scope.joinDraft = function() {
-            if ($scope.draftSessionId === undefined ||
-                $scope.draftSessionId === null ||
-                $scope.draftSessionId === "") return;
-            draftHub.invoke("JoinDraft", [$scope.draftSessionId], function() {});
+            if ($scope.draftSessionIdCandidate === undefined ||
+                $scope.draftSessionIdCandidate === null ||
+                $scope.draftSessionIdCandidate === "") return;
+            draftHub.invoke("JoinDraft", [$scope.draftSessionIdCandidate], function() {});
         };
         $scope.startDraft = function () {
             if ($scope.draftSessionId === undefined ||
@@ -78,6 +79,11 @@
             $scope.currentBooster = [];
             if ($scope.openBoosters.length > 0) {
                 $scope.currentBooster = $scope.openBoosters.splice(0, 1);
+            }
+        };
+        $scope.setCurrentBooster = function () {
+            if ($scope.unOpenedBoosters.length > 0 && $scope.openBoosters.length === 0 && $scope.currentBooster.length === 0) {
+                $scope.currentBooster = $scope.unOpenedBoosters.pop();
             }
         };
         $scope.addCardToNotWantedCards = function (event) {
