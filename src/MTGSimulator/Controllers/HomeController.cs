@@ -8,5 +8,9 @@ namespace MTGSimulator.Controllers
         {
             return View();
         }
+        public IActionResult Draft()
+        {
+            return View();
+        }
     }
 }
