@@ -39,7 +39,8 @@
     "inputFiles": [
       "wwwroot/js/app.js",
       "wwwroot/js/directive.js",
-      "wwwroot/js/signalRService.js"
+      "wwwroot/js/signalRService.js",
+      "wwwroot/js/visualJs.js"
     ],
     // Optionally specify minification options
     "minify": {
