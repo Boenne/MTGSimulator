@@ -28,16 +28,29 @@ namespace MTGSimulator.Data.Tests.Repositories
         {
             var sessionId = Guid.NewGuid().ToString().GenerateHash();
             var playerId = Guid.NewGuid().ToString().GenerateHash();
+            var player2Id = Guid.NewGuid().ToString().GenerateHash();
             var session = new DraftSession {Id = sessionId, HasStarted = true, SetCode = "LEA"};
             var draftPlayer = new DraftPlayer {DraftSessionId = session.Id, Id = playerId};
+            var draftPlayer2 = new DraftPlayer {DraftSessionId = session.Id, Id = player2Id};
 
             await draftSessionRepository.Save(session);
             await draftPlayerRepository.Save(draftPlayer);
+            await draftPlayerRepository.Save(draftPlayer2);
 
             var playerExists = await draftPlayerRepository.PlayerExists(playerId, sessionId);
             playerExists.ShouldBe(true);
 
+            var numberOfPlayers = await draftPlayerRepository.GetNumberOfPlayers(sessionId);
+            numberOfPlayers.ShouldBe(2);
+
+            var nextPlayerId = await draftPlayerRepository.GetNextPlayer(playerId, sessionId);
+            nextPlayerId.ShouldBe(player2Id);
+
+            nextPlayerId = await draftPlayerRepository.GetNextPlayer(player2Id, sessionId);
+            nextPlayerId.ShouldBe(playerId);
+
             await draftPlayerRepository.Delete(playerId);
+            await draftPlayerRepository.Delete(player2Id);
             await draftSessionRepository.Delete(sessionId);
 
             playerExists = await draftPlayerRepository.PlayerExists(playerId, draftPlayer.Id);
