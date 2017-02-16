@@ -1,0 +1,20 @@
+﻿<div ng-repeat="enchantment in card.enchantments track by enchantment.id" style="position: relative;" id="{{enchantment.id}}"
+     onmouseover="cardMouseOver(this)" onmouseout="cardMouseOut(this)" onmousewheel="cardZoom(this)" onclick=" cardClickFromBattlefield(event)">
+    <img ng-src="{{getImgSrc(enchantment)}}"
+         ng-style="getTopStyleForEnchantment(card.enchantments.length, $index)"
+         class="battlefieldEnchantment"/>
+
+    <div ng-if="enchantment.counters > 0" ng-style="getTopStyleForEnchantmentCounter(card.enchantments.length, $index)"
+         class="counterLabelDivEnchantment">
+        <label class="counterLabel" ng-bind="enchantment.counters"></label>
+    </div>
+</div>
+<div style="position: relative;" id="{{card.id}}"
+     onmouseover="cardMouseOver(this)" onmouseout="cardMouseOut(this)" onmousewheel="cardZoom(this)" onclick=" cardClickFromBattlefield(event)">
+    <img ng-src="{{getImgSrc(card)}}"
+         class="battlefieldCard"/>
+
+    <div ng-if="card.counters > 0" class="counterLabelDiv">
+        <label class="counterLabel" ng-bind="card.counters"></label>
+    </div>
+</div>

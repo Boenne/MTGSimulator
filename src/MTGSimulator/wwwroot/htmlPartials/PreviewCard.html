@@ -1,0 +1,8 @@
+﻿<div style="position: relative; z-index: 2" onmouseover="cardMouseOver(this, 3)" onmouseout=" cardMouseOut(this, 2)">
+    <img ng-src="{{getImgSrc(card)}}"
+         id="{{card.id}}"
+         class="previewCard"/>
+    <div ng-if="card.amount > 0" class="counterLabelDiv">
+        <label class="graveyardAmount" ng-bind="card.amount"></label>
+    </div>
+</div>
