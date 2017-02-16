@@ -11,6 +11,36 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="wwwroot\css\site.css" />
+    <Content Include="wwwroot\htmlPartials\CardWithEnchantmentsPartial.html" />
+    <Content Include="wwwroot\htmlPartials\DraftCard.html" />
+    <Content Include="wwwroot\htmlPartials\PreviewCard.html" />
+    <Content Include="wwwroot\images\morph.jpg" />
+    <Content Include="wwwroot\images\mtg.jpg" />
+    <Content Include="wwwroot\images\mtgBackSide.jpg" />
+    <Content Include="wwwroot\images\Tokens\angel.jpg" />
+    <Content Include="wwwroot\images\Tokens\beast.jpg" />
+    <Content Include="wwwroot\images\Tokens\centaur.jpg" />
+    <Content Include="wwwroot\images\Tokens\dragon.jpg" />
+    <Content Include="wwwroot\images\Tokens\drake.jpg" />
+    <Content Include="wwwroot\images\Tokens\eldrazi.jpg" />
+    <Content Include="wwwroot\images\Tokens\elemental.jpg" />
+    <Content Include="wwwroot\images\Tokens\elf.jpg" />
+    <Content Include="wwwroot\images\Tokens\goblin.jpg" />
+    <Content Include="wwwroot\images\Tokens\human.jpg" />
+    <Content Include="wwwroot\images\Tokens\ooze.jpg" />
+    <Content Include="wwwroot\images\Tokens\spirit.jpg" />
+    <Content Include="wwwroot\images\Tokens\vampire.jpg" />
+    <Content Include="wwwroot\images\Tokens\wolf.jpg" />
+    <Content Include="wwwroot\images\Tokens\wurm.jpg" />
+    <Content Include="wwwroot\images\Tokens\zombie.jpg" />
+    <Content Include="wwwroot\js\app.js" />
+    <Content Include="wwwroot\js\directives.js" />
+    <Content Include="wwwroot\js\draft\controller.js" />
+    <Content Include="wwwroot\js\draft\controller.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="wwwroot\**\*;Views\**\*;Areas\**\Views;appsettings.json;web.config">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
