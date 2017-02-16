@@ -1,0 +1,103 @@
+﻿<div ng-controller="DraftController" ng-show="connected">
+    <table class="form-group" ng-show="draftSessionId == null" style="left: 10px; position: absolute; top: 10px; width: 300px;">
+        <tr>
+            <td>
+                <input type="text" class="form-control" ng-model="draftSessionId" placeholder="Draft session ID"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select ng-model="selectedSet" class="form-control">
+                    <option ng-repeat="set in sets" value="{{set.code}}">{{set.name}}</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" class="btn btn-info form-control" value="Create" ng-click="createDraft()"/>
+            </td>
+            <td>
+                <input type="button" class="btn btn-info form-control" value="Join" ng-click="joinDraft()"/>
+            </td>
+        </tr>
+    </table>
+    <table class="form-group" ng-show="draftSessionId != null && !draftStarted" style="left: 10px; position: absolute; top: 10px; width: 300px;">
+        <tr>
+            <td>
+                <p>When all players have join press 'Start'</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" disabled="disabled" ng-model="draftSessionId"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" class="btn btn-info form-control" value="Start" ng-click="startDraft()"/>
+            </td>
+        </tr>
+    </table>
+    <table class="form-group" ng-show="draftStarted" style="left: 10px; position: absolute; top: 10px; width: 300px;">
+        <tr>
+            <td>
+                <input type="button" class="btn btn-success form-control" value="Open booster" ng-click="setCurrentBooster()"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea placeholder="JSON" ng-bind="selectedCardsJson" class="form-control" style="height: 150px"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Unopened boosters left:</label>
+            </td>
+            <td>
+                <label ng-bind="unOpenedBoosters.length"></label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Open boosters:</label>
+            </td>
+            <td>
+                <label ng-bind="openBoosters.length"></label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Cards in deck:</label>
+            </td>
+            <td>
+                <label ng-bind="selectedCards.length"></label>
+            </td>
+        </tr>
+    </table>
+    <div class="previewDiv" ng-style="getLeft($index, 400, 50)" ng-repeat="card in currentBooster track by card.id">
+        <preview-card ng-click="pickCard($event)"/>
+    </div>
+    <div class="previewDiv" ng-show="showNotWantedCards" ng-style="getLeft($index, 400, 50)" ng-repeat="card in bundleCollection(notWantedCards) track by card.id">
+        <preview-card ng-click="removeCardFromNotWantedCards($event)"/>
+    </div>
+    <div style="bottom: 10px; position: absolute" ng-style="getPosition($index, 10)" ng-repeat="card in bundleCollection(selectedCards) track by card.id"
+         onmousewheel="cardZoom(this)">
+        <draft-card ng-click="addCardToNotWantedCards($event)"/>
+    </div>
+    <div style="position: absolute; right: 10px; top: 10px;" ng-if="notWantedCards.length > 0" ng-repeat="card in getTopCardOf(notWantedCards) track by card.id">
+        <img ng-src="{{getImgSrc(card)}}"
+             id="{{card.id}}"
+             class="previewCard" ng-click="flipShow()"/>
+    </div>
+
+    <img id="cardZoomPreview" class="zoomCard">
+
+    @section Scripts{
+        <environment names="Development">
+            <script src="~/js/draft/controller.js" asp-append-version="true"></script>
+        </environment>
+        <environment names="Staging,Production">
+            <script src="~/js/draft/controller.min.js" asp-append-version="true"></script>
+        </environment>
+    }
+</div>
