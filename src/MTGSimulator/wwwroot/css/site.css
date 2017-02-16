@@ -1,0 +1,143 @@
+﻿html, body {
+    overflow: hidden;
+}
+
+.simulatorCard {
+    border-radius: 12px;
+    height: 310px;
+    position: absolute;
+    width: 223px;
+    z-index: 2;
+}
+
+.zoomCard {
+    border-radius: 12px;
+    height: 310px;
+    left: 800px;
+    position: absolute;
+    top: 400px;
+    visibility: hidden;
+    width: 223px;
+    z-index: 3;
+}
+
+.defaultCard {
+    border-radius: 12px;
+    content: url("../images/mtgBackSide.jpg");
+    height: 155px;
+    width: 111px;
+}
+
+.counterLabel {
+    color: white;
+    font-size: 20px;
+    left: 45%;
+    position: relative;
+}
+
+.graveyardAmount {
+    color: white;
+    font-size: 40px;
+    left: 45%;
+    position: relative;
+}
+
+.counterLabelDivEnchantment {
+    background-color: black;
+    height: 18%;
+    opacity: 0.7;
+    position: absolute;
+    width: 100%;
+}
+
+.counterLabelDiv {
+    background-color: black;
+    height: 18%;
+    opacity: 0.7;
+    position: absolute;
+    top: 10%;
+    width: 100%;
+}
+
+.battlefieldCard {
+    border-radius: 12px;
+    height: 155px;
+    position: relative;
+    width: 111px;
+}
+
+.battlefieldEnchantment {
+    border-radius: 12px;
+    height: 155px;
+    position: absolute;
+    width: 111px;
+}
+
+.log {
+    bottom: 10px;
+    color: white;
+    height: 310px;
+    overflow: auto;
+    position: absolute;
+    right: 10px;
+    width: 400px;
+}
+
+.previewCard {
+    border-radius: 12px;
+    height: 310px;
+    position: relative;
+    width: 223px;
+}
+
+.graveyardCard {
+    border-radius: 12px;
+    height: 155px;
+    width: 111px;
+}
+
+.myGraveyard {
+    bottom: 10px;
+    left: 10px;
+    position: absolute;
+}
+
+.opponentsGraveyard {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.myLibrary {
+    bottom: 10px;
+    left: 150px;
+    position: absolute;
+}
+
+.opponentsLibrary {
+    position: absolute;
+    right: 150px;
+    top: 10px;
+}
+
+.hand {
+    bottom: 10px;
+    height: 310px;
+    left: 550px;
+    position: absolute;
+}
+
+.previewDiv {
+    position: absolute;
+    top: 100px;
+}
+
+.rotate90 {
+    -webkit-transform: rotate(90deg);
+    transition: .2s linear;
+}
+
+.resetRotation {
+    -webkit-transform: rotate(0deg);
+    transition: .2s linear;
+}
