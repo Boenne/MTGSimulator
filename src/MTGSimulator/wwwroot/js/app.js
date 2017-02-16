@@ -1,4 +1,4 @@
 ﻿'use strict';
 
-var app = angular.module('draftApp', []);
+var app = angular.module('mtgApp', []);
 app.value('backendServerUrl', document.location.origin);
