@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MTGSimulator.Data.Extensions;
 using MTGSimulator.Service.Models;
+using Newtonsoft.Json;
 
 namespace MTGSimulator.Service
 {
@@ -36,29 +38,38 @@ namespace MTGSimulator.Service
             return boosters;
         }
 
-        private static Booster CreateBooster(IReadOnlyList<Card> commons, IReadOnlyList<Card> unCommons,
+        private Booster CreateBooster(IReadOnlyList<Card> commons, IReadOnlyList<Card> unCommons,
             IReadOnlyList<Card> rares)
         {
             var booster = new Booster();
-            for (var j = 0; j < 14; j++)
+            var random = new Random();
+            for (var i = 0; i < 14; i++)
             {
-                if (j < 10)
+                if (i < 10)
                 {
-                    var index = new Random().Next(commons.Count);
-                    booster.Cards.Add(commons[index]);
+                    var index = random.Next(commons.Count);
+                    booster.Cards.Add(CopyCard(commons[index]));
                 }
-                else if (j < 13)
+                else if (i < 13)
                 {
-                    var index = new Random().Next(unCommons.Count);
-                    booster.Cards.Add(unCommons[index]);
+                    var index = random.Next(unCommons.Count);
+                    booster.Cards.Add(CopyCard(unCommons[index]));
                 }
                 else
                 {
-                    var index = new Random().Next(rares.Count);
-                    booster.Cards.Add(rares[index]);
+                    var index = random.Next(rares.Count);
+                    booster.Cards.Add(CopyCard(rares[index]));
                 }
             }
+            //Give each card a unique id
+            booster.Cards.ForEach(x => x.Id = Guid.NewGuid().ToString());
             return booster;
+        }
+
+        private Card CopyCard(Card card)
+        {
+            var json = JsonConvert.SerializeObject(card);
+            return JsonConvert.DeserializeObject<Card>(json);
         }
     }
 }
