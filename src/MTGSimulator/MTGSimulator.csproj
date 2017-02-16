@@ -37,7 +37,7 @@
     <Content Include="wwwroot\js\app.js" />
     <Content Include="wwwroot\js\directives.js" />
     <Content Include="wwwroot\js\draft\controller.js" />
-    <Content Include="wwwroot\js\draft\controller.min.js" />
+    <Content Include="wwwroot\js\visualJs.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,7 +78,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="appsettings.json" />
+    <None Include="appsettings.development.json" />
   </ItemGroup>
 
   <ItemGroup>
