@@ -58,7 +58,7 @@ namespace MTGSimulator.Hubs
                 await JoinGroup(draftId);
                 var boosters = await boosterCreator.CreateBoosters(setCode, 3);
                 connections.Add(draftPlayer.Id, Context.ConnectionId);
-                Clients.Caller.InitializeGame(new {draftId, playerId, boosters});
+                Clients.Caller.InitializeGame(new {draftId, playerId, boosters = boosters.Select(x => x.Cards) });
             }
             catch (Exception e)
             {
@@ -73,12 +73,13 @@ namespace MTGSimulator.Hubs
             try
             {
                 var draftSession = await draftSessionRepository.Get(draftId);
-                if (draftSession == null) return;
+                if (draftSession == null || draftSession.HasStarted) return;
                 var playerId = Guid.NewGuid().ToString().GenerateHash();
                 var draftPlayer = new DraftPlayer {DraftSessionId = draftSession.Id, Id = playerId};
                 await draftPlayerRepository.Save(draftPlayer);
+                await JoinGroup(draftId);
                 var boosters = await boosterCreator.CreateBoosters(draftSession.SetCode, 3);
-                Clients.Caller.InitializeGame(new {draftId, playerId, boosters});
+                Clients.Caller.InitializeGame(new {draftId, playerId, boosters = boosters.Select(x => x.Cards)});
             }
             catch (Exception e)
             {
