@@ -5,3 +5,5 @@ lib/
 packages/
 /src/MTGSimulator/appsettings.json
 /src/.vs
+*.min.js
+*.min.css
