@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using MTGSimulator.Data;
@@ -13,18 +14,35 @@ namespace MTGSimulator.Hubs
     public class DraftHub : Hub
     {
         private readonly IBoosterCreator boosterCreator;
+        private readonly ICardParser cardParser;
         private readonly Dictionary<string, string> connections = new Dictionary<string, string>();
         private readonly IDraftPlayerRepository draftPlayerRepository;
         private readonly IDraftSessionRepository draftSessionRepository;
         private readonly ILogger logger;
 
         public DraftHub(IBoosterCreator boosterCreator, IDraftPlayerRepository draftPlayerRepository,
-            IDraftSessionRepository draftSessionRepository, ILogger logger)
+            IDraftSessionRepository draftSessionRepository, ILogger logger, ICardParser cardParser)
         {
             this.boosterCreator = boosterCreator;
             this.draftPlayerRepository = draftPlayerRepository;
             this.draftSessionRepository = draftSessionRepository;
             this.logger = logger;
+            this.cardParser = cardParser;
+        }
+
+        public async Task GetAvailableSets()
+        {
+            try
+            {
+                var sets = await cardParser.GetSets();
+                Clients.Caller.SetSets(sets.Select(x => new {code = x.Key, name = x.Value.Name}));
+            }
+            catch (Exception e)
+            {
+                var errorMessage = $"{nameof(GetAvailableSets)} failed";
+                logger.Error(errorMessage, e);
+                throw new HubException(errorMessage);
+            }
         }
 
         public async Task CreateDraft(string setCode)
@@ -60,7 +78,7 @@ namespace MTGSimulator.Hubs
                 var draftPlayer = new DraftPlayer {DraftSessionId = draftSession.Id, Id = playerId};
                 await draftPlayerRepository.Save(draftPlayer);
                 var boosters = await boosterCreator.CreateBoosters(draftSession.SetCode, 3);
-                Clients.Caller.InitializeGame(new { draftId, playerId, boosters });
+                Clients.Caller.InitializeGame(new {draftId, playerId, boosters});
             }
             catch (Exception e)
             {
