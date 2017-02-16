@@ -7,3 +7,4 @@ packages/
 /src/.vs
 *.min.js
 *.min.css
+*.pubxml
