@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MTGSimulator.Data.Cache;
 using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Models;
 using Newtonsoft.Json;
@@ -21,11 +22,14 @@ namespace MTGSimulator.Data.Repositories
     {
         private readonly IDatabaseContextFactory databaseContextFactory;
         private readonly ILogger logger;
+        private readonly ICacheService cacheService;
 
-        public DraftSessionRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger)
+        public DraftSessionRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger,
+            ICacheService cacheService)
         {
             this.databaseContextFactory = databaseContextFactory;
             this.logger = logger;
+            this.cacheService = cacheService;
         }
 
         public async Task Save(DraftSession draftSession)
@@ -55,6 +59,8 @@ namespace MTGSimulator.Data.Repositories
                     if (draftSessionToUpdate == null) return;
                     draftSessionToUpdate.HasStarted = true;
                     await databaseContext.SaveChangesAsync();
+
+                    cacheService.Invalidate(draftId);
                 }
             }
             catch (Exception e)
@@ -91,6 +97,8 @@ namespace MTGSimulator.Data.Repositories
                     if (draftSession == null) return;
                     databaseContext.DraftSessions.Remove(draftSession);
                     await databaseContext.SaveChangesAsync();
+
+                    cacheService.Invalidate(draftId);
                 }
             }
             catch (Exception e)
@@ -103,9 +111,15 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
+                var cacheServiceResponse = cacheService.Get<bool>(nameof(HasStarted), draftId);
+                if (cacheServiceResponse.Hit) return cacheServiceResponse.Value;
+
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var hasStarted = await databaseContext.DraftSessions.AnyAsync(x => x.Id == draftId && x.HasStarted);
+
+                    cacheService.Cache(nameof(HasStarted), draftId, hasStarted, draftId);
+
                     return hasStarted;
                 }
             }

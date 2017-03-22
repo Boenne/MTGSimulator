@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
+using MTGSimulator.Data.Cache;
 using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Extensions;
 using MTGSimulator.Data.Models;
@@ -16,7 +17,8 @@ namespace MTGSimulator.Data.Tests.Repositories
         {
             var logger = new Mock<ILogger>();
             var databaseContextFactory = new DatabaseContextFactory("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True");
-            draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object);
+            var cacheService = new Mock<ICacheService>();
+            draftSessionRepository = new DraftSessionRepository(databaseContextFactory, logger.Object, cacheService.Object);
         }
 
         private readonly DraftSessionRepository draftSessionRepository;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MTGSimulator.Data.Cache;
 using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Models;
 using Newtonsoft.Json;
@@ -20,21 +21,30 @@ namespace MTGSimulator.Data.Repositories
     {
         private readonly IDatabaseContextFactory databaseContextFactory;
         private readonly ILogger logger;
+        private readonly ICacheService cacheService;
 
-        public DraftPlayerRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger)
+        public DraftPlayerRepository(IDatabaseContextFactory databaseContextFactory, ILogger logger,
+            ICacheService cacheService)
         {
             this.databaseContextFactory = databaseContextFactory;
             this.logger = logger;
+            this.cacheService = cacheService;
         }
 
         public async Task<bool> PlayerExists(string playerId, string draftId)
         {
             try
             {
+                var cacheServiceResponse = cacheService.Get<bool>(nameof(PlayerExists), playerId, draftId);
+                if (cacheServiceResponse.Hit) return cacheServiceResponse.Value;
+
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var playerExists =
                         await databaseContext.DraftPlayers.AnyAsync(x => x.Id == playerId && x.DraftSessionId == draftId);
+
+                    cacheService.Cache(nameof(PlayerExists), draftId, playerExists, playerId, draftId);
+
                     return playerExists;
                 }
             }
@@ -57,6 +67,8 @@ namespace MTGSimulator.Data.Repositories
                     draftPlayer.Number = count;
                     databaseContext.DraftPlayers.Add(draftPlayer);
                     await databaseContext.SaveChangesAsync();
+
+                    cacheService.Invalidate(draftPlayer.DraftSessionId);
                 }
             }
             catch (Exception e)
@@ -69,9 +81,15 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
+                var cacheServiceResponse = cacheService.Get<int>(nameof(GetNumberOfPlayers), draftId);
+                if (cacheServiceResponse.Hit) return cacheServiceResponse.Value;
+
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var numberOfPlayers = await databaseContext.DraftPlayers.CountAsync(x => x.DraftSessionId == draftId);
+
+                    cacheService.Cache(nameof(GetNumberOfPlayers), draftId, numberOfPlayers, draftId);
+
                     return numberOfPlayers;
                 }
             }
@@ -93,6 +111,8 @@ namespace MTGSimulator.Data.Repositories
                     if (draftPlayer == null) return;
                     databaseContext.DraftPlayers.Remove(draftPlayer);
                     await databaseContext.SaveChangesAsync();
+
+                    cacheService.Invalidate(draftPlayer.DraftSessionId);
                 }
             }
             catch (Exception e)
@@ -105,6 +125,9 @@ namespace MTGSimulator.Data.Repositories
         {
             try
             {
+                var cacheServiceResponse = cacheService.Get<string>(nameof(GetNextPlayer), playerId, draftId);
+                if (cacheServiceResponse.Hit) return cacheServiceResponse.Value;
+
                 using (var databaseContext = databaseContextFactory.Create())
                 {
                     var numberOfPlayers = await databaseContext.DraftPlayers.CountAsync(x => x.DraftSessionId == draftId);
@@ -120,6 +143,9 @@ namespace MTGSimulator.Data.Repositories
                         draftPlayer =
                             await databaseContext.DraftPlayers.FirstAsync(
                                 x => x.Number == 0 && x.DraftSessionId == draftId);
+
+                    cacheService.Cache(nameof(GetNextPlayer), draftId, draftPlayer.Id, playerId, draftId);
+
                     return draftPlayer.Id;
                 }
             }
