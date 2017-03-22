@@ -1,4 +1,5 @@
-﻿using LightInject;
+﻿using System;
+using LightInject;
 using LightInject.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MTGSimulator.Data;
+using MTGSimulator.Data.Cache;
 using MTGSimulator.Data.ContextFactory;
 using MTGSimulator.Data.Repositories;
 using MTGSimulator.Service;
@@ -40,6 +42,7 @@ namespace MTGSimulator
             services.AddSingleton<IDatabaseContextFactory>(new DatabaseContextFactory(Configuration.GetConnectionString("DefaultConnectionString")));
             services.AddScoped<ICardParser, CardParser>();
             services.AddScoped<IBoosterCreator, BoosterCreator>();
+            services.AddSingleton<ICacheService, CacheService>();
             container.CreateServiceProvider(services);
         }
 
