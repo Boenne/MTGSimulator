@@ -19,7 +19,7 @@ namespace MTGSimulator.Data.ContextFactory
 
         public DatabaseContext Create()
         {
-            var dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            var dbContextOptionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
 
             dbContextOptionsBuilder.UseSqlServer(connectionString);
 
