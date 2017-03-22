@@ -36,7 +36,7 @@
                     amount: card.amount,
                     id: card.multiverseid
                 };
-                if (card.names !== undefined && card.names.length > 1) { // find flip id of back side of card
+                if (card.names !== undefined && card.names !== null && card.names.length > 1) { // find flip id of back side of card
                     simplifiedCard.flipId = "REMEMBER TO ADD GATHERER ID FOR FLIP CARD";
                 }
                 result.push(simplifiedCard);
@@ -78,7 +78,7 @@
             draftHub.invoke("PassOnBooster", [$scope.playerId, $scope.draftSessionId, $scope.currentBooster], function () { });
             $scope.currentBooster = [];
             if ($scope.openBoosters.length > 0) {
-                $scope.currentBooster = $scope.openBoosters.splice(0, 1);
+                $scope.currentBooster = $scope.openBoosters.splice(0, 1)[0];
             }
         };
         $scope.setCurrentBooster = function () {
