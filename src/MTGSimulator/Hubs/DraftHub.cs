@@ -15,7 +15,7 @@ namespace MTGSimulator.Hubs
     {
         private readonly IBoosterCreator boosterCreator;
         private readonly ICardParser cardParser;
-        private readonly Dictionary<string, string> connections = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> Connections = new Dictionary<string, string>();
         private readonly IDraftPlayerRepository draftPlayerRepository;
         private readonly IDraftSessionRepository draftSessionRepository;
         private readonly ILogger logger;
@@ -57,7 +57,7 @@ namespace MTGSimulator.Hubs
                 await draftPlayerRepository.Save(draftPlayer);
                 await JoinGroup(draftId);
                 var boosters = await boosterCreator.CreateBoosters(setCode, 3);
-                connections.Add(draftPlayer.Id, Context.ConnectionId);
+                Connections.Add(draftPlayer.Id, Context.ConnectionId);
                 Clients.Caller.InitializeGame(new {draftId, playerId, boosters = boosters.Select(x => x.Cards) });
             }
             catch (Exception e)
@@ -79,6 +79,7 @@ namespace MTGSimulator.Hubs
                 await draftPlayerRepository.Save(draftPlayer);
                 await JoinGroup(draftId);
                 var boosters = await boosterCreator.CreateBoosters(draftSession.SetCode, 3);
+                Connections.Add(draftPlayer.Id, Context.ConnectionId);
                 Clients.Caller.InitializeGame(new {draftId, playerId, boosters = boosters.Select(x => x.Cards)});
             }
             catch (Exception e)
@@ -99,7 +100,7 @@ namespace MTGSimulator.Hubs
                 var nextPlayer = await draftPlayerRepository.GetNextPlayer(playerId, draftId);
                 if (nextPlayer == null) return;
 
-                Clients.User(connections[nextPlayer]).ReceiveBooster(booster);
+                Clients.Client(Connections[nextPlayer]).ReceiveBooster(booster);
             }
             catch (Exception e)
             {
